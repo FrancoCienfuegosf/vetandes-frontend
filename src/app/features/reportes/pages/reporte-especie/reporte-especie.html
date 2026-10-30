@@ -1,0 +1,43 @@
+<section>
+  <header class="page-header">
+    <h2>Atenciones por especie</h2>
+  </header>
+
+  <form [formGroup]="filtros" (ngSubmit)="consultar()" class="filtros">
+    <label>Desde <input class="input" type="date" formControlName="desde" /></label>
+    <label>Hasta <input class="input" type="date" formControlName="hasta" /></label>
+    <button type="submit" class="btn btn-primary">Consultar</button>
+  </form>
+
+  @if (error()) {
+    <div class="alerta">{{ error() }}</div>
+  }
+
+  @if (cargando()) {
+    <p>Cargando reporte...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Especie</th>
+          <th class="num">Atenciones</th>
+          <th class="num">Importe total</th>
+          <th class="barra-col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of filas(); track f.especie) {
+          <tr>
+            <td><span class="chip">{{ f.especie }}</span></td>
+            <td class="num">{{ f.cantidadAtenciones }}</td>
+            <td class="num">{{ f.importeTotal | currency: 'PEN' : 'S/ ' }}</td>
+            <td><div class="barra" [style.width.%]="porcentaje(f.importeTotal)"></div></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4" class="vacio">No hay atenciones registradas en ese rango.</td></tr>
+        }
+      </tbody>
+    </table>
+    <p class="nota">Excluye las atenciones anuladas. Ordenado por importe descendente.</p>
+  }
+</section>

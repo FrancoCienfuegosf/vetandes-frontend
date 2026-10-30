@@ -1,0 +1,6 @@
+.cabecera { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.cabecera > div { display: flex; flex-direction: column; gap: 2px; }
+.cabecera .ancho { grid-column: 1 / -1; }
+.et { font-size: 12px; text-transform: uppercase; color: #6b7280; }
+.anular { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; max-width: 560px; }
+.anular label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }

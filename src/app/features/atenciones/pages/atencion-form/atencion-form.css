@@ -1,0 +1,17 @@
+.registro { display: flex; flex-direction: column; gap: 16px; }
+fieldset { border: 1px solid #e3e8f0; border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+legend { font-weight: 700; color: #0f4c45; padding: 0 6px; }
+label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.sub { color: #6b7280; font-size: 13px; }
+.seleccionada { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.resultados { list-style: none; margin: 0; padding: 0; border: 1px solid #e3e8f0; border-radius: 8px; overflow: hidden; }
+.resultados button { width: 100%; text-align: left; background: #fff; border: 0; border-bottom: 1px solid #eef2f6;
+  padding: 8px 12px; font: inherit; cursor: pointer; }
+.resultados button:hover { background: #eef5f3; }
+.detalle th, .detalle td { vertical-align: top; }
+.detalle th { background: #e6f4f1; color: #0f4c45; }
+.cantidad { width: 80px; }
+.totales { margin-left: auto; min-width: 320px; display: flex; flex-direction: column; gap: 6px; }
+.totales > div { display: flex; justify-content: space-between; gap: 16px; }
+.totales .total { font-size: 18px; font-weight: 700; border-top: 1px solid #e3e8f0; padding-top: 6px; }
+.alerta ul { margin: 6px 0 0; }
