@@ -1,0 +1,60 @@
+<section>
+  <header class="page-header">
+    <h2>Prestaciones</h2>
+    <a *siPermiso="'PRESTACION_ESCRIBIR'" routerLink="nuevo" class="btn btn-primary">+ Nueva prestación</a>
+  </header>
+
+  <div class="filtros">
+    <label>
+      Buscar
+      <input class="input" placeholder="Código o nombre" [value]="busqueda()"
+             (input)="busqueda.set($any($event.target).value)" />
+    </label>
+  </div>
+
+  @if (mensaje()) {
+    <div class="exito">{{ mensaje() }}</div>
+  }
+  @if (error()) {
+    <div class="alerta">{{ error() }} <button type="button" class="btn" (click)="error.set(null)">Cerrar</button></div>
+  }
+
+  @if (cargando()) {
+    <p>Cargando prestaciones...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Especie</th>
+          <th class="num">Precio</th>
+          <th>Estado</th>
+          <th *siPermiso="'PRESTACION_ESCRIBIR'">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of filtradas(); track p.id) {
+          <tr>
+            <td>{{ p.codigo }}</td>
+            <td>{{ p.nombre }}</td>
+            <td><span class="chip">{{ p.especieAplicable }}</span></td>
+            <td class="num">{{ p.precio | currency: 'PEN' : 'S/ ' }}</td>
+            <td><span class="badge" [class.inactivo]="!p.activo">{{ p.activo ? 'Activa' : 'Inactiva' }}</span></td>
+            <td *siPermiso="'PRESTACION_ESCRIBIR'" class="acciones">
+              <a [routerLink]="[p.id, 'editar']" class="btn">Editar</a>
+              <button type="button" class="btn" [class.btn-peligro]="p.activo" (click)="cambiarEstado(p)">
+                {{ p.activo ? 'Dar de baja' : 'Reactivar' }}
+              </button>
+              <button type="button" class="btn btn-peligro" (click)="eliminar(p)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="vacio">
+            {{ busqueda() ? 'Ninguna prestación coincide con la búsqueda.' : 'No hay prestaciones registradas.' }}
+          </td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
