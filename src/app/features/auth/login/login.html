@@ -1,0 +1,30 @@
+<div class="fondo">
+  <form [formGroup]="form" (ngSubmit)="ingresar()" class="card login">
+    <h1>🐾 VetAndes</h1>
+    <p class="sub">Atenciones de la clínica veterinaria</p>
+
+    @if (error()) {
+      <div class="alerta">{{ error() }}</div>
+    }
+
+    <label>
+      Usuario
+      <input class="input" formControlName="username" autocomplete="username" />
+    </label>
+    @if (form.controls.username.touched && form.controls.username.invalid) {
+      <small class="error">Ingrese su usuario.</small>
+    }
+
+    <label>
+      Contraseña
+      <input class="input" type="password" formControlName="password" autocomplete="current-password" />
+    </label>
+    @if (form.controls.password.touched && form.controls.password.invalid) {
+      <small class="error">Ingrese su contraseña.</small>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+      {{ enviando() ? 'Ingresando...' : 'Ingresar' }}
+    </button>
+  </form>
+</div>

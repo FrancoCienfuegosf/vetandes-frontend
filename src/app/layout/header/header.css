@@ -1,0 +1,13 @@
+:host { display: block; }
+.header {
+  height: 64px; display: flex; align-items: center; gap: 16px;
+  padding: 0 20px; background: #0f4c45; color: #fff;
+}
+.btn-menu { background: none; border: 0; color: inherit; font-size: 22px; cursor: pointer; }
+.marca { color: #f6c453; font-weight: 700; font-size: 20px; text-decoration: none; }
+.usuario { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.nombre { font-weight: 600; }
+.rol { padding: 2px 8px; border-radius: 999px; background: rgb(255 255 255 / 0.15); font-size: 12px; }
+.btn-salir { background: none; border: 1px solid rgb(255 255 255 / 0.5); color: #fff; border-radius: 8px;
+  padding: 6px 12px; cursor: pointer; font: inherit; }
+.btn-salir:hover { background: rgb(255 255 255 / 0.1); }

@@ -1,0 +1,81 @@
+<section>
+  <header class="page-header">
+    <h2>Detalle de atención</h2>
+    <a routerLink="/atenciones" class="btn">← Volver a la consulta</a>
+  </header>
+
+  @if (mensaje()) {
+    <div class="exito">{{ mensaje() }}</div>
+  }
+  @if (error()) {
+    <div class="alerta">{{ error() }}</div>
+  }
+
+  @if (cargando()) {
+    <p>Cargando atención...</p>
+  } @else if (atencion(); as a) {
+    <div class="card cabecera">
+      <div><span class="et">Número</span><strong>{{ a.numero }}</strong></div>
+      <div><span class="et">Fecha</span>{{ a.fecha | date: 'dd/MM/yyyy HH:mm' }}</div>
+      <div><span class="et">Estado</span>
+        <span class="badge" [class.anulada]="a.estado === 'ANULADA'">{{ a.estado }}</span></div>
+      <div><span class="et">Mascota</span>{{ a.mascotaNombre }} ({{ a.especie }})</div>
+      <div><span class="et">Propietario</span>{{ a.propietarioNombre }}</div>
+      <div><span class="et">Peso</span>{{ a.peso }} kg</div>
+      <div class="ancho"><span class="et">Diagnóstico</span>{{ a.diagnostico || '—' }}</div>
+      <div><span class="et">Registrado por</span>{{ a.usuarioRegistro }}</div>
+      @if (a.motivoAnulacion) {
+        <div class="ancho"><span class="et">Motivo de anulación</span>{{ a.motivoAnulacion }}</div>
+      }
+    </div>
+
+    <table class="tabla" style="margin-top: 16px">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Prestación</th>
+          <th class="num">Cantidad</th>
+          <th class="num">Precio unit.</th>
+          <th class="num">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (d of a.detalles; track d.id) {
+          <tr>
+            <td>{{ d.prestacionCodigo }}</td>
+            <td>{{ d.prestacionNombre }}</td>
+            <td class="num">{{ d.cantidad }}</td>
+            <td class="num">{{ d.precioUnitario | currency: 'PEN' : 'S/ ' }}</td>
+            <td class="num">{{ d.subtotal | currency: 'PEN' : 'S/ ' }}</td>
+          </tr>
+        }
+        <tr><td colspan="4" class="num">Subtotal</td><td class="num">{{ a.subtotal | currency: 'PEN' : 'S/ ' }}</td></tr>
+        <tr><td colspan="4" class="num">Descuento</td><td class="num">- {{ a.descuento | currency: 'PEN' : 'S/ ' }}</td></tr>
+        <tr><td colspan="4" class="num"><strong>Total</strong></td><td class="num"><strong>{{ a.total | currency: 'PEN' : 'S/ ' }}</strong></td></tr>
+      </tbody>
+    </table>
+
+    @if (a.estado === 'REGISTRADA') {
+      <div *siPermiso="'ATENCION_ANULAR'" class="card anular">
+        @if (!mostrarAnular()) {
+          <button type="button" class="btn btn-peligro" (click)="mostrarAnular.set(true)">Anular atención</button>
+        } @else {
+          <label>
+            Motivo de anulación
+            <textarea class="input" rows="3" [formControl]="motivo" placeholder="Mínimo 10 caracteres"></textarea>
+          </label>
+          @if (motivo.touched && motivo.invalid) {
+            <small class="error">El motivo es obligatorio y debe tener entre 10 y 200 caracteres.</small>
+          }
+          <div class="acciones">
+            <button type="button" class="btn" (click)="mostrarAnular.set(false)">Cancelar</button>
+            <button type="button" class="btn btn-peligro" [disabled]="anulando()" (click)="anular()">
+              {{ anulando() ? 'Anulando...' : 'Confirmar anulación' }}
+            </button>
+          </div>
+        }
+      </div>
+    }
+  }
+</section>
+

@@ -1,0 +1,61 @@
+<section>
+  <header class="page-header">
+    <h2>Mascotas</h2>
+    <a *siPermiso="'MASCOTA_ESCRIBIR'" routerLink="nuevo" class="btn btn-primary">+ Nueva mascota</a>
+  </header>
+
+  <div class="filtros">
+    <label>
+      Propietario
+      <select class="input" (change)="filtrarPorPropietario($any($event.target).value)">
+        <option value="">Todos</option>
+        @for (p of propietarios(); track p.id) {
+          <option [value]="p.id">{{ p.nombres }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (mensaje()) {
+    <div class="exito">{{ mensaje() }}</div>
+  }
+  @if (error()) {
+    <div class="alerta">{{ error() }} <button type="button" class="btn" (click)="error.set(null)">Cerrar</button></div>
+  }
+
+  @if (cargando()) {
+    <p>Cargando mascotas...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Especie</th>
+          <th>Raza</th>
+          <th>Edad</th>
+          <th>Sexo</th>
+          <th>Propietario</th>
+          <th *siPermiso="'MASCOTA_ESCRIBIR'">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of mascotas(); track m.id) {
+          <tr>
+            <td>{{ m.nombre }}</td>
+            <td><span class="chip">{{ m.especie }}</span></td>
+            <td>{{ m.raza || '—' }}</td>
+            <td>{{ m.fechaNacimiento | edad }}</td>
+            <td>{{ m.sexo === 'M' ? 'Macho' : 'Hembra' }}</td>
+            <td>{{ m.propietarioNombre }}</td>
+            <td *siPermiso="'MASCOTA_ESCRIBIR'" class="acciones">
+              <a [routerLink]="[m.id, 'editar']" class="btn">Editar</a>
+              <button type="button" class="btn btn-peligro" (click)="eliminar(m)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7" class="vacio">No hay mascotas para mostrar.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
