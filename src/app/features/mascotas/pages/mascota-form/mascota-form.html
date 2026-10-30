@@ -1,0 +1,93 @@
+<section>
+  <h2>{{ esEdicion() ? 'Editar mascota' : 'Nueva mascota' }}</h2>
+
+  @if (error()) {
+    <div class="alerta">{{ error() }}</div>
+  }
+
+  @if (cargando()) {
+    <p>Cargando datos...</p>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="card formulario">
+      <label>
+        Propietario
+        <select class="input" formControlName="propietarioId">
+          <option [ngValue]="null" disabled>Seleccione un propietario...</option>
+          @for (p of propietarios(); track p.id) {
+            <option [ngValue]="p.id">{{ p.nombres }} (DNI {{ p.dni }})</option>
+          }
+        </select>
+        @if (form.controls.propietarioId.touched && form.controls.propietarioId.invalid) {
+          <small class="error">Seleccione el propietario.</small>
+        }
+        @if (erroresServidor()['propietarioId']; as m) { <small class="error">{{ m }}</small> }
+      </label>
+
+      <div class="fila">
+        <label>
+          Nombre
+          <input class="input" formControlName="nombre" />
+          @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+            <small class="error">El nombre es obligatorio y debe tener entre 2 y 40 caracteres.</small>
+          }
+          @if (erroresServidor()['nombre']; as m) { <small class="error">{{ m }}</small> }
+        </label>
+        <label>
+          Especie
+          <select class="input" formControlName="especie">
+            <option value="" disabled>Seleccione...</option>
+            <option value="PERRO">Perro</option>
+            <option value="GATO">Gato</option>
+            <option value="OTRO">Otro</option>
+          </select>
+          @if (form.controls.especie.touched && form.controls.especie.invalid) {
+            <small class="error">La especie es obligatoria.</small>
+          }
+          @if (erroresServidor()['especie']; as m) { <small class="error">{{ m }}</small> }
+        </label>
+      </div>
+
+      <div class="fila">
+        <label>
+          Raza (opcional)
+          <input class="input" formControlName="raza" />
+          @if (form.controls.raza.touched && form.controls.raza.invalid) {
+            <small class="error">La raza admite hasta 40 caracteres.</small>
+          }
+          @if (erroresServidor()['raza']; as m) { <small class="error">{{ m }}</small> }
+        </label>
+        <label>
+          Sexo
+          <select class="input" formControlName="sexo">
+            <option value="" disabled>Seleccione...</option>
+            <option value="M">Macho</option>
+            <option value="H">Hembra</option>
+          </select>
+          @if (form.controls.sexo.touched && form.controls.sexo.invalid) {
+            <small class="error">El sexo es obligatorio.</small>
+          }
+          @if (erroresServidor()['sexo']; as m) { <small class="error">{{ m }}</small> }
+        </label>
+      </div>
+
+      <label>
+        Fecha de nacimiento
+        <input class="input" type="date" formControlName="fechaNacimiento" [max]="hoy" />
+        @if (form.controls.fechaNacimiento.touched && form.controls.fechaNacimiento.hasError('required')) {
+          <small class="error">La fecha de nacimiento es obligatoria.</small>
+        }
+        @if (form.controls.fechaNacimiento.hasError('fechaFutura')) {
+          <small class="error">La fecha de nacimiento no puede ser futura.</small>
+        }
+        @if (erroresServidor()['fechaNacimiento']; as m) { <small class="error">{{ m }}</small> }
+      </label>
+
+      <div class="acciones" style="justify-content: flex-end">
+        <a routerLink="/mascotas" class="btn">Cancelar</a>
+        <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : esEdicion() ? 'Actualizar' : 'Registrar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

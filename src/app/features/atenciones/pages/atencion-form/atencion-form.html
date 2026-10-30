@@ -1,0 +1,151 @@
+<section>
+  <header class="page-header">
+    <h2>Nueva atención</h2>
+    <a routerLink="/atenciones" class="btn">Ver atenciones</a>
+  </header>
+
+  @if (exito()) {
+    <div class="exito">✅ {{ exito() }}</div>
+  }
+  @if (error()) {
+    <div class="alerta">
+      {{ error() }}
+      @if (camposServidor().length) {
+        <ul>
+          @for (c of camposServidor(); track c[0]) {
+            <li>{{ c[0] }}: {{ c[1] }}</li>
+          }
+        </ul>
+      }
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="registrar()" class="card registro">
+    <!-- 1. Mascota -->
+    <fieldset>
+      <legend>Mascota</legend>
+      @if (mascota(); as m) {
+        <div class="seleccionada">
+          <div>
+            <strong>{{ m.nombre }}</strong> <span class="chip">{{ m.especie }}</span>
+            <div class="sub">Propietario: {{ m.propietarioNombre }}</div>
+          </div>
+          <button type="button" class="btn" (click)="cambiarMascota()">Cambiar</button>
+        </div>
+      } @else {
+        <input class="input" placeholder="Buscar por nombre de mascota o de propietario..."
+               [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" />
+        @if (resultados().length) {
+          <ul class="resultados">
+            @for (m of resultados(); track m.id) {
+              <li>
+                <button type="button" (click)="seleccionarMascota(m)">
+                  <strong>{{ m.nombre }}</strong> · {{ m.especie }} · {{ m.propietarioNombre }}
+                </button>
+              </li>
+            }
+          </ul>
+        } @else if (busqueda()) {
+          <small class="sub">Sin coincidencias.</small>
+        }
+        @if (form.touched) {
+          <small class="error">Seleccione la mascota.</small>
+        }
+      }
+    </fieldset>
+
+    <!-- 2. Cabecera -->
+    <div class="fila">
+      <label>
+        Peso (kg)
+        <input class="input" type="number" step="0.01" min="0.01" formControlName="peso" />
+        @if (form.controls.peso.touched && form.controls.peso.invalid) {
+          <small class="error">El peso es obligatorio y debe ser mayor que cero.</small>
+        }
+        @if (erroresServidor()['peso']; as m) { <small class="error">{{ m }}</small> }
+      </label>
+      <label>
+        Diagnóstico
+        <input class="input" formControlName="diagnostico" maxlength="300" />
+        @if (erroresServidor()['diagnostico']; as m) { <small class="error">{{ m }}</small> }
+      </label>
+    </div>
+
+    <!-- 3. Detalle dinamico -->
+    <fieldset [disabled]="!mascota()">
+      <legend>Prestaciones</legend>
+      @if (cargandoPrestaciones()) {
+        <p class="sub">Cargando prestaciones de la especie...</p>
+      }
+      <table class="tabla detalle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Prestación</th>
+            <th class="num">Precio</th>
+            <th>Cantidad</th>
+            <th class="num">Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody formArrayName="detalles">
+          @for (linea of detalles.controls; track linea; let i = $index) {
+            <tr [formGroupName]="i">
+              <td>{{ i + 1 }}</td>
+              <td>
+                <select class="input" formControlName="prestacionId">
+                  <option [ngValue]="null" disabled>Seleccione...</option>
+                  @for (p of opcionesPara(i); track p.id) {
+                    <option [ngValue]="p.id">{{ p.codigo }} · {{ p.nombre }}</option>
+                  }
+                </select>
+                @if (linea.controls.prestacionId.touched && linea.controls.prestacionId.invalid) {
+                  <small class="error">Elija una prestación.</small>
+                }
+              </td>
+              <td class="num">{{ lineas()[i]?.precio | currency: 'PEN' : 'S/ ' }}</td>
+              <td>
+                <input class="input cantidad" type="number" min="1" max="3" step="1" formControlName="cantidad" />
+                @if (linea.controls.cantidad.invalid) {
+                  <small class="error">De 1 a 3.</small>
+                }
+              </td>
+              <td class="num">{{ lineas()[i]?.subtotal | currency: 'PEN' : 'S/ ' }}</td>
+              <td><button type="button" class="btn btn-peligro" (click)="quitarLinea(i)" aria-label="Quitar línea">✕</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="vacio">
+              {{ mascota() ? 'Agregue al menos una prestación.' : 'Primero seleccione la mascota.' }}
+            </td></tr>
+          }
+        </tbody>
+      </table>
+
+      @if (detalles.hasError('repetida')) {
+        <small class="error">Una prestación no puede repetirse.</small>
+      }
+      @if (detalles.touched && detalles.hasError('required')) {
+        <small class="error">La atención debe tener al menos una prestación.</small>
+      }
+
+      <button type="button" class="btn" (click)="agregarLinea()"
+              [disabled]="detalles.length >= maxLineas || !mascota()">
+        + Agregar prestación ({{ detalles.length }}/{{ maxLineas }})
+      </button>
+    </fieldset>
+
+    <!-- 4. Totales (vista previa; el backend calcula los definitivos) -->
+    <div class="totales">
+      <div><span>Subtotal</span><span>{{ subtotal() | currency: 'PEN' : 'S/ ' }}</span></div>
+      <div><span>Descuento {{ distintas() >= 3 ? '(10 % por 3 o más prestaciones)' : '' }}</span>
+        <span>- {{ descuento() | currency: 'PEN' : 'S/ ' }}</span></div>
+      <div class="total"><span>Total</span><span>{{ total() | currency: 'PEN' : 'S/ ' }}</span></div>
+    </div>
+
+    <div class="acciones" style="justify-content: flex-end">
+      <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+        {{ enviando() ? 'Registrando...' : 'Registrar atención' }}
+      </button>
+    </div>
+  </form>
+</section>

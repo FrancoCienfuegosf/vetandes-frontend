@@ -1,0 +1,66 @@
+<section>
+  <h2>{{ esEdicion() ? 'Editar prestación' : 'Nueva prestación' }}</h2>
+
+  @if (error()) {
+    <div class="alerta">{{ error() }}</div>
+  }
+
+  @if (cargando()) {
+    <p>Cargando datos...</p>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="card formulario">
+      <div class="fila">
+        <label>
+          Código
+          <input class="input" formControlName="codigo" placeholder="PRS-010" />
+          @if (form.controls.codigo.touched && form.controls.codigo.invalid) {
+            <small class="error">El código es obligatorio con el formato PRS-000.</small>
+          }
+          @if (erroresServidor()['codigo']; as m) { <small class="error">{{ m }}</small> }
+        </label>
+        <label>
+          Especie aplicable
+          <select class="input" formControlName="especieAplicable">
+            <option value="" disabled>Seleccione...</option>
+            <option value="PERRO">PERRO</option>
+            <option value="GATO">GATO</option>
+            <option value="TODAS">TODAS</option>
+          </select>
+          @if (form.controls.especieAplicable.touched && form.controls.especieAplicable.invalid) {
+            <small class="error">Seleccione la especie aplicable.</small>
+          }
+          @if (erroresServidor()['especieAplicable']; as m) { <small class="error">{{ m }}</small> }
+        </label>
+      </div>
+
+      <label>
+        Nombre
+        <input class="input" formControlName="nombre" />
+        @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+          <small class="error">El nombre es obligatorio y debe tener entre 3 y 80 caracteres.</small>
+        }
+        @if (erroresServidor()['nombre']; as m) { <small class="error">{{ m }}</small> }
+      </label>
+
+      <label>
+        Precio (S/)
+        <input class="input" type="number" step="0.01" min="0.01" formControlName="precio" />
+        @if (form.controls.precio.touched && form.controls.precio.invalid) {
+          <small class="error">El precio es obligatorio y debe ser mayor que cero.</small>
+        }
+        @if (erroresServidor()['precio']; as m) { <small class="error">{{ m }}</small> }
+      </label>
+
+      <label class="check">
+        <span><input type="checkbox" formControlName="activo" /> Activa</span>
+      </label>
+
+      <div class="acciones" style="justify-content: flex-end">
+        <a routerLink="/prestaciones" class="btn">Cancelar</a>
+        <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : esEdicion() ? 'Actualizar' : 'Registrar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

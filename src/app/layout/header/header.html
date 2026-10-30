@@ -1,0 +1,11 @@
+<header class="header">
+  <button type="button" class="btn-menu" aria-label="Mostrar u ocultar menú" (click)="toggleMenu.emit()">☰</button>
+  <a routerLink="/inicio" class="marca">🐾 VetAndes</a>
+  <div class="usuario">
+    <span class="nombre">{{ auth.nombreCompleto() }}</span>
+    @for (rol of auth.roles(); track rol) {
+      <span class="rol">{{ rol }}</span>
+    }
+    <button type="button" class="btn-salir" (click)="salir()">Cerrar sesión</button>
+  </div>
+</header>
